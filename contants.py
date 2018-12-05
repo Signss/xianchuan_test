@@ -3,7 +3,7 @@ SEND_NUM = 10
 # 小传ip
 IP = '192.168.43.5'
 # udp发送端口
-UDP_PORT = 5
+UDP_PORT = 1000
 # tcp获取硬件信息端口
 TCP_INFO_PORT = 2000
 # tcp传图端口
