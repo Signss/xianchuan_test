@@ -1,4 +1,7 @@
 import socket, json
+
+import sys
+
 import contants
 from utils import deal_tcp
 
@@ -143,10 +146,16 @@ class XiaoChuan(object):
         # self.DSLR_connectionstatus()
         self.tcp_client.close()
 
-
-if __name__ == '__main__':
+# 参数化运行
+def main():
+    contants.IP = sys.argv[1]
+    print(contants.IP)
     xiaochuan = XiaoChuan(contants.IP, contants.TCP_INFO_PORT)
     xiaochuan.run()
+
+if __name__ == '__main__':
+    main()
+
 
 
 

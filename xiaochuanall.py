@@ -94,9 +94,14 @@ class XiaoChuan(object):
         data_list = self.run_send()
         self.save_data(data_list)
         self.tcp_client.close()
-
-if __name__ == '__main__':
+# 参数化运行
+def main():
+    contants.IP = sys.argv[1]
+    print(contants.IP)
     xiaochuan = XiaoChuan(contants.IP, contants.TCP_INFO_PORT)
     xiaochuan.run()
+
+if __name__ == '__main__':
+    main()
 
 
