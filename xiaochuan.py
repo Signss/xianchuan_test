@@ -1,9 +1,10 @@
-import socket, json
-
+import json
+import socket
 import sys
 
-import contants
-from utils import deal_tcp
+from libs import contants
+from libs.utils import deals_tcp
+
 
 # 挨个多次发送模式
 class XiaoChuan(object):
@@ -47,32 +48,32 @@ class XiaoChuan(object):
     # tcp获取硬件配置信息
     def get_config(self):
         send_data = contants.TCP_CONFIG_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_config')
+        deals_tcp(self.tcp_client, send_data, 't_config')
 
     # 设置WIFI并重连：Set Wifi Config
     def set_wifi(self):
         send_data = contants.TCP_WIFI_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_setwifi')
+        deals_tcp(self.tcp_client, send_data, 't_setwifi')
 
     # 启动上传
     def start_upload(self):
         send_data = contants.TCP_STARTUP_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_start_upload')
+        deals_tcp(self.tcp_client, send_data, 't_start_upload')
 
     # 停止上传
     def stop_upload(self):
         send_data = contants.TCP_STOPUP_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_stop_upload')
+        deals_tcp(self.tcp_client, send_data, 't_stop_upload')
 
     # 查看当前上传状态
     def get_status(self):
         send_data = contants.TCP_UPSTATUS_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_upload_status')
+        deals_tcp(self.tcp_client, send_data, 't_upload_status')
 
     # 清空缓存
     def clear_cache(self):
         send_data = contants.TCP_CLEARPHOTOS_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_clear_cache')
+        deals_tcp(self.tcp_client, send_data, 't_clear_cache')
 
     # 查询剩余电量
     def get_batterypercen(self):
@@ -123,15 +124,25 @@ class XiaoChuan(object):
     # 查询相机连接状态
     def DSLR_connectionstatus(self):
         send_data = contants.TCP_DSLRSTATUS_DATA.encode()
-        deal_tcp(self.tcp_client, send_data, 't_DSLR_connectionstatus')
+        deals_tcp(self.tcp_client, send_data, 't_DSLR_connectionstatus')
     # 接收图片
     def recv_img(self):
-        self.tcp_client.connect((self.ip,contants.TCP_IMG_PORT))
+        # 启动上传数据包
+        send_data = contants.TCP_STOPUP_DATA.encode()
+        self.tcp_connect()
+        self.tcp_client.send(send_data)
+        self.tcp_client.close()
+        tcp_client_img = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        tcp_client_img.connect((self.ip, contants.TCP_IMG_PORT))
         while True:
             recv_data = self.tcp_client.recv(1024)
             if recv_data:
                 with open('aaa.jpg', 'wb+') as f:
                     f.write(recv_data)
+            else:
+                break
+            tcp_client_img.close()
+            return
 
 
     def run(self):
@@ -144,7 +155,7 @@ class XiaoChuan(object):
         # self.clear_cache()
         self.get_batterypercen()
         # self.DSLR_connectionstatus()
-        self.tcp_client.close()
+        self.recv_img()
 
 # 参数化运行
 def main():

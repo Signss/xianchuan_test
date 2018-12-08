@@ -1,6 +1,11 @@
-import socket, json
-import contants
-from utils import deal_all_tcp
+import json
+import socket
+
+import sys
+
+from libs import contants
+from libs.utils import deal_all_tcp
+
 
 # 整体多次发送模式
 class XiaoChuan(object):
