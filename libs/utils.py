@@ -1,11 +1,11 @@
-import contants, json
-# tcp发送数据包通用处理方法
-def deal_tcp(tcp_client, send_data, filename):
+import json
+from libs import contants
+
+# tcp发送数据包压力测试处理方法
+def deals_tcp(tcp_client, send_data, filename):
     offset = 0
     config_datas = []
     error_datas = []
-    # 获取硬件配置信息
-
     while offset < contants.SEND_NUM:
         tcp_client.send(send_data)
         recv_data = tcp_client.recv(1024)
@@ -38,6 +38,38 @@ def deal_tcp(tcp_client, send_data, filename):
     else:
         print('暂无错误响应')
 
+def deal_tcp(tcp_client, send_data, filename):
+    # tcp客户端发送tcp数据包
+    tcp_client.send(send_data)
+    # tcp服务端响应数据包
+    recv_data = tcp_client.recv(1024)
+    # 把响应的数据包转化为字典
+    recv_dict = json.loads(recv_data.decode())
+    status = recv_dict.get('errno')
+    if not recv_data:
+        # 无响应
+        content = {
+            'tcp_type': filename,
+            'type': '无响应',
+            'status': False
+        }
+        return content
+    else:
+        #响应错误
+        if status != 0:
+            content = {
+                'tcp_type': filename,
+                'type': '响应错误',
+                'status_error': status,
+                'status': False
+               }
+            return content
+        else:
+            content = {
+                'type': 'pass',
+                'status': True
+            }
+            return content
 
 def deal_all_tcp(send_data, tcp_client):
     tcp_client.send(contants.TCP_CONFIG_DATA.encode())
